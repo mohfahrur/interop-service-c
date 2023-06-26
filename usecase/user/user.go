@@ -12,19 +12,19 @@ type UserAgent interface {
 }
 
 type UserUsecase struct {
-	userDomain userD.UserDomain
+	UserDomain userD.UserDomain
 }
 
 func NewUserUsecase(
 	userD userD.UserDomain) *UserUsecase {
 
 	return &UserUsecase{
-		userDomain: userD}
+		UserDomain: userD}
 }
 
 func (uc *UserUsecase) GetUser(userID string) (userData *entity.User, err error) {
 
-	userData, err = uc.userDomain.GetUserInfo(userID)
+	userData, err = uc.UserDomain.GetUserInfo(userID)
 	if err != nil {
 		log.Println(err)
 		return

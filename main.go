@@ -18,6 +18,7 @@ import (
 
 func main() {
 	log.SetFlags(log.Llongfile)
+
 	spreadsheetID := os.Getenv("spreadsheetID")
 	dbConfig := os.Getenv("dbConfig")
 
@@ -40,7 +41,6 @@ func main() {
 	defer db.Close()
 
 	userDomain := database.NewUserDomain(db)
-
 	googleDomain := googleD.NewGoogleDomain(credentialsFile, spreadsheetID)
 	ticketUsecase := ticketUC.NewTicketUsecase(*googleDomain)
 	userUsecase := userUC.NewUserUsecase(*userDomain)
@@ -55,7 +55,33 @@ func main() {
 		})
 		return
 	})
-	r1.POST("/update-data", func(c *gin.Context) {
+	r1.GET("/get-users/:id", func(c *gin.Context) {
+		datas, err := userUsecase.UserDomain.GetUserInfo(c.Param("id"))
+		if err != nil {
+			log.Println(err)
+			c.JSON(http.StatusBadRequest, gin.H{
+				"message": "bad request",
+			})
+			return
+		}
+		c.JSON(http.StatusOK, datas)
+		return
+	})
+
+	r1.GET("/get-users", func(c *gin.Context) {
+		datas, err := userUsecase.UserDomain.GetUsers()
+		if err != nil {
+			log.Println(err)
+			c.JSON(http.StatusBadRequest, gin.H{
+				"message": "bad request",
+			})
+			return
+		}
+		c.JSON(http.StatusOK, datas)
+		return
+	})
+
+	r.POST("/update-data", func(c *gin.Context) {
 		var req entity.UpdateSheetRequest
 		err := c.BindJSON(&req)
 		if err != nil {

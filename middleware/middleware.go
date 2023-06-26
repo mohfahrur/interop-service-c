@@ -1,11 +1,11 @@
 package middleware
 
 import (
+	"crypto/sha256"
+	"encoding/base64"
 	"net/http"
-	"os"
 
 	"github.com/gin-gonic/gin"
-	"github.com/mohfahrur/interop-service-c/entity"
 	userUC "github.com/mohfahrur/interop-service-c/usecase/user"
 
 	"github.com/microcosm-cc/bluemonday"
@@ -13,23 +13,30 @@ import (
 
 func AuthAndAuthorize(userUC userUC.UserUsecase) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if os.Getenv("token") != c.GetHeader("token") {
+		if c.GetHeader("token") == "" {
 			c.JSON(http.StatusUnauthorized, gin.H{
 				"message": "Unauthorized",
 			})
 			return
 		}
-		var req entity.GetUserRequest
-		err := c.BindJSON(&req)
+		token := sanitizeInput(c.GetHeader("token"))
 
-		id := sanitizeInput(req.ID)
+		h := sha256.New()
+		h.Write([]byte(token))
+		bs := h.Sum(nil)
+		sEnc := base64.StdEncoding.EncodeToString([]byte(bs))
 
-		user, err := userUC.GetUser(id)
+		user, err := userUC.UserDomain.GetUserAuth(sEnc)
 		if err != nil {
 			c.AbortWithStatusJSON(500, gin.H{"error": "Failed to retrieve user information"})
 			return
 		}
-
+		if user == nil {
+			c.JSON(http.StatusUnauthorized, gin.H{
+				"message": "Unauthorized",
+			})
+			return
+		}
 		c.Set("userID", user.ID)
 		c.Set("userRole", user.Role)
 
