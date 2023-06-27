@@ -7,12 +7,23 @@ import (
 	"os"
 
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 	googleD "github.com/mohfahrur/interop-service-c/domain/google"
 	entity "github.com/mohfahrur/interop-service-c/entity"
 	ticketUC "github.com/mohfahrur/interop-service-c/usecase/ticket"
 )
 
 func main() {
+
+	// load .env file from given path
+  	// we keep it empty it will load .env from current directory
+  	err := godotenv.Load(".env")
+
+  	if err != nil {
+    	log.Fatalf("Error loading .env file")
+  	}
+
+
 	log.SetFlags(log.Llongfile)
 	spreadsheetID := os.Getenv("spreadsheetID")
 
