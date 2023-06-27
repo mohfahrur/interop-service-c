@@ -42,14 +42,14 @@ func (d *GoogleDomain) UpdateSheetPenjualan(data entity.UpdateSheetRequest) (err
 			{data.User, data.Email, data.Hp, data.Item},
 		},
 	}
-	lastRow, err := d.SheetService.Spreadsheets.Values.Get(d.SpreadsheetID, "Penjualan!A:A").Do()
+	lastRow, err := d.SheetService.Spreadsheets.Values.Get(d.SpreadsheetID, "PMG Penjualan!A:A").Do()
 	if err != nil {
 		log.Printf("Failed to get last row: %v", err)
 		return
 	}
 	rowIndex := len(lastRow.Values) + 1
 
-	targetRange := fmt.Sprintf("Penjualan!A%d:D%d", rowIndex, rowIndex)
+	targetRange := fmt.Sprintf("PMG Penjualan!A%d:D%d", rowIndex, rowIndex)
 
 	_, err = d.SheetService.Spreadsheets.Values.Update(d.SpreadsheetID, targetRange, valueRange).ValueInputOption("USER_ENTERED").Do()
 	if err != nil {
