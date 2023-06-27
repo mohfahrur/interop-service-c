@@ -6,3 +6,7 @@ type UpdateSheetRequest struct {
 	Hp    string `json:"hp"`
 	Item  string `json:"item"`
 }
+
+type GetUserRequest struct {
+	ID string `json:"id"`
+}
